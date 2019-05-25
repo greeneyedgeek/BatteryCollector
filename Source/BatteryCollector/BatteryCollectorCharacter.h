@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Runtime/Engine/Classes/Components/SphereComponent.h"
+#include "SpawnVolume.h"
 #include "BatteryCollectorCharacter.generated.h"
 
 UCLASS(config=Game)

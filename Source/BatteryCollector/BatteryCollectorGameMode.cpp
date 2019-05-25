@@ -5,6 +5,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "BatteryCollectorCharacter.h"
+#include "Runtime/Core/Public/Containers/Array.h"
+#include "Runtime/Engine/Classes/GameFramework/PawnMovementComponent.h"
+#include "Runtime/Engine/Classes/GameFramework/Character.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -24,6 +27,20 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 void ABatteryCollectorGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//find all the spawn volume actors
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnVolume::StaticClass(), FoundActors);
+
+	for (auto Actor : FoundActors)
+	{
+		ASpawnVolume* SpawnVolumeActor = Cast<ASpawnVolume>(Actor);
+		if (SpawnVolumeActor)
+		{
+			SpawnVolumeActors.AddUnique(SpawnVolumeActor);
+		}
+	}
+
 	SetCurrentState(EBatteryPlayState::EPlaying);
 
 	// Set the score to beat
@@ -80,5 +97,64 @@ EBatteryPlayState ABatteryCollectorGameMode::GetCurrentState()
 
 void ABatteryCollectorGameMode::SetCurrentState(EBatteryPlayState NewState)
 {
+	// Set current state
 	CurrentState = NewState;
+
+	// Handle the new current state
+	HandleNewState(CurrentState);
+}
+
+void ABatteryCollectorGameMode::HandleNewState(EBatteryPlayState NewState)
+{
+	switch (NewState)
+	{
+		case EBatteryPlayState::EPlaying:
+		{
+			// Spawn volumes active
+			for (ASpawnVolume* Volume : SpawnVolumeActors)
+			{
+				Volume->SetSpawningActive(true);
+			}
+		}
+		break;
+		case EBatteryPlayState::EWon:
+		{
+			// Spawn volumes inactive
+			for (ASpawnVolume* Volume : SpawnVolumeActors)
+			{
+				Volume->SetSpawningActive(false);
+			}
+
+		}
+		break;
+		case EBatteryPlayState::EGameOver:
+		{
+			// Spawn volumes inactive
+			for (ASpawnVolume* Volume : SpawnVolumeActors)
+			{
+				Volume->SetSpawningActive(false);
+			}
+			// Block player input
+			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+			if (PlayerController)
+			{
+				PlayerController->SetCinematicMode(true, false, false, true, true);
+			}
+			// Ragdoll the character
+			ACharacter* MyCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+			if (MyCharacter)
+			{
+				MyCharacter->GetMesh()->SetSimulatePhysics(true);
+				MyCharacter->GetMovementComponent()->MovementState.bCanJump = false;
+			}
+
+		}
+		break;
+		default:
+		case EBatteryPlayState::EUnknown:
+		{
+
+		}
+		break;
+	}
 }
