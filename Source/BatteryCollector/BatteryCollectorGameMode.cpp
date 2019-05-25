@@ -21,6 +21,27 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 	}
 }
 
+void ABatteryCollectorGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Set the score to beat
+	ABatteryCollectorCharacter* MyCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (MyCharacter)
+	{
+		PowerToWin = (MyCharacter->GetInitialPower()) * 1.25f;
+	}
+
+	if (HUDWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
+}
+
 // Check whether or not we are using the nattery collector character
 void ABatteryCollectorGameMode::Tick(float DeltaTime)
 {
@@ -32,8 +53,12 @@ void ABatteryCollectorGameMode::Tick(float DeltaTime)
 		// Decrase the character's power if it's positive
 		if (MyCharacter->GetCurrentPower() > 0)
 		{
-			MyCharacter->UpdatePower(-DeltaTime*DecayRate*(MyCharacter->GetInitialPower()));
+			MyCharacter->UpdatePower(-DeltaTime * DecayRate*(MyCharacter->GetInitialPower()));
 		}
 	}
 }
 
+float ABatteryCollectorGameMode::GetPowerToWin()
+{
+	return PowerToWin;
+}
