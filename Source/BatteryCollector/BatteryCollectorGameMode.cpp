@@ -7,6 +7,7 @@
 #include "BatteryCollectorCharacter.h"
 #include "Runtime/Core/Public/Containers/Array.h"
 #include "Runtime/Engine/Classes/GameFramework/PawnMovementComponent.h"
+#include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 #include "Runtime/Engine/Classes/GameFramework/Character.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
