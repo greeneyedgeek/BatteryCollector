@@ -1,7 +1,7 @@
 # BatteryCollector
 ## A third person game tutorial using UE4 and C++
 
-<img src="https://github.com/greeneyedgeek/BatteryCollector/blob/master/image-battery.png" alt="" class="mr-2 header-search-key-slash">
+<img src="https://github.com/greeneyedgeek/BatteryCollector/blob/master/image-battery.png" alt="">
 
 ##### I have adapted the original code to take advantage of the Include-What-You-Use (IWYU) style. 
 ##### It runs on engine version 4.22.
